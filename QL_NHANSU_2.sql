@@ -83,8 +83,8 @@ CREATE TABLE CHAMCONG
 (
     ID_CHAMCONG CHAR(20) NOT NULL,
     NGAYVAO DATETIME,
-	TRANGTHAIVAO BIT NULL,--0 là check vào rồi
-	TRANGTHAIRA BIT NULL,--1 là chưa check
+	TRANGTHAIVAO BIT NULL,
+	TRANGTHAIRA BIT NULL,
     MANV INT NOT NULL,
     CONSTRAINT PK_CHAMCONG PRIMARY KEY (ID_CHAMCONG, MaNV),
 	CONSTRAINT FK_CHAMCONG_EMPLOYEE FOREIGN KEY (MANV) REFERENCES HoSoNhanVien(MANV)
@@ -144,6 +144,9 @@ ADD THU AS
         WHEN 7 THEN N'Thứ bảy'
     END;
 GO
+
+
+select *from CHAMCONG
 --chay trigger de them du lieu vao bang cong 
 CREATE TRIGGER THEMDULIEUVAOBANGCONG
 ON CHAMCONG
@@ -159,14 +162,22 @@ BEGIN
         MONTH(GETDATE()) AS THANG,  -- Lấy tháng từ THOIGIANVAO trong bảng ảo
         YEAR(GETDATE()) AS NAM,  -- Lấy năm từ THOIGIANVAO trong bảng ảo
         i.ID_CHAMCONG,  -- Lấy ID_CHAMCONG từ bảng ảo INSERTED
-		CASE 
-			WHEN i.TRANGTHAIVAO = 0 OR i.TRANGTHAIRA = 0  THEN N'Chưa Hoàn Thành'
-			ELSE N'Hoàn Thành'
-		END AS TRANGTHAI-- Giá trị cho cột TRANGTHAI
+		-- Giá trị cho cột TRANGTHAI
     FROM 
         INSERTED i;  -- Lấy dữ liệu từ bảng ảo INSERTED (các bản ghi mới được thêm)
 END;
-
+CREATE TRIGGER trg_UpdateTrangThai
+ON CHAMCONG
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    UPDATE CHAMCONG
+    SET TRANGTHAI = CASE 
+        WHEN TRANGTHAIVAO = 0 OR TRANGTHAIRA = 0 THEN N'Chưa Hoàn Thành'
+        ELSE N'Hoàn Thành'
+    END
+    WHERE ID_CHAMCONG IN (SELECT ID_CHAMCONG FROM inserted);
+END
 
 -- Bảng kỉ luật khen thưởng
 CREATE TABLE KhenThuongKyLuat (
@@ -406,3 +417,13 @@ drop table Luong
 drop table PhanCong
 drop table PhongBan
 drop table TrinhDoNangLuc
+
+--mỗi ngày import vào mỗi nhân viên
+DECLARE @CurrentDate DATETIME = GETDATE();
+
+INSERT INTO CHAMCONG (ID_CHAMCONG, NGAYVAO, MANV)
+SELECT 
+    LEFT(CAST(MANV AS CHAR(10)) + FORMAT(@CurrentDate, 'MMdd'), 20), -- Chỉ lấy phần cần thiết
+    @CurrentDate, 
+    MANV
+FROM HoSoNhanVien; -- Lấy tất cả mã nhân viên từ bảng HoSoNhanVien

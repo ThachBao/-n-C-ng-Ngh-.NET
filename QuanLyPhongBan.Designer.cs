@@ -41,7 +41,7 @@
             this.label5 = new System.Windows.Forms.Label();
             this.cb_phongBan = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txt_chucVu = new System.Windows.Forms.TextBox();
             this.bt_themNhanVien = new System.Windows.Forms.Button();
             this.bt_xoaNhanVien = new System.Windows.Forms.Button();
             this.bt_suaNhanVien = new System.Windows.Forms.Button();
@@ -56,6 +56,7 @@
             this.treeView_phongBan.Name = "treeView_phongBan";
             this.treeView_phongBan.Size = new System.Drawing.Size(350, 403);
             this.treeView_phongBan.TabIndex = 0;
+            this.treeView_phongBan.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_phongBan_AfterSelect);
             // 
             // groupBox1
             // 
@@ -176,13 +177,13 @@
             this.label6.TabIndex = 8;
             this.label6.Text = "Chức Vụ";
             // 
-            // textBox1
+            // txt_chucVu
             // 
-            this.textBox1.Location = new System.Drawing.Point(597, 258);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(193, 29);
-            this.textBox1.TabIndex = 9;
+            this.txt_chucVu.Location = new System.Drawing.Point(597, 258);
+            this.txt_chucVu.Multiline = true;
+            this.txt_chucVu.Name = "txt_chucVu";
+            this.txt_chucVu.Size = new System.Drawing.Size(193, 29);
+            this.txt_chucVu.TabIndex = 9;
             // 
             // bt_themNhanVien
             // 
@@ -192,19 +193,21 @@
             this.bt_themNhanVien.TabIndex = 10;
             this.bt_themNhanVien.Text = "Thêm";
             this.bt_themNhanVien.UseVisualStyleBackColor = true;
+            this.bt_themNhanVien.Click += new System.EventHandler(this.bt_themNhanVien_Click);
             // 
             // bt_xoaNhanVien
             // 
-            this.bt_xoaNhanVien.Location = new System.Drawing.Point(626, 428);
+            this.bt_xoaNhanVien.Location = new System.Drawing.Point(645, 428);
             this.bt_xoaNhanVien.Name = "bt_xoaNhanVien";
             this.bt_xoaNhanVien.Size = new System.Drawing.Size(145, 59);
             this.bt_xoaNhanVien.TabIndex = 11;
             this.bt_xoaNhanVien.Text = "Xóa";
             this.bt_xoaNhanVien.UseVisualStyleBackColor = true;
+            this.bt_xoaNhanVien.Click += new System.EventHandler(this.bt_xoaNhanVien_Click);
             // 
             // bt_suaNhanVien
             // 
-            this.bt_suaNhanVien.Location = new System.Drawing.Point(829, 428);
+            this.bt_suaNhanVien.Location = new System.Drawing.Point(842, 428);
             this.bt_suaNhanVien.Name = "bt_suaNhanVien";
             this.bt_suaNhanVien.Size = new System.Drawing.Size(145, 59);
             this.bt_suaNhanVien.TabIndex = 12;
@@ -237,7 +240,7 @@
             this.Controls.Add(this.bt_suaNhanVien);
             this.Controls.Add(this.bt_xoaNhanVien);
             this.Controls.Add(this.bt_themNhanVien);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.txt_chucVu);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.cb_phongBan);
             this.Controls.Add(this.label5);
@@ -272,7 +275,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox cb_phongBan;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txt_chucVu;
         private System.Windows.Forms.Button bt_themNhanVien;
         private System.Windows.Forms.Button bt_xoaNhanVien;
         private System.Windows.Forms.Button bt_suaNhanVien;

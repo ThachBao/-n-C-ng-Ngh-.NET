@@ -30,7 +30,9 @@ namespace HMresourcemanagementsystem.ChamCong
             {
                 string sql = @"SELECT CC.ID_CHAMCONG, CC.MANV AS N'Mã Nhân Viên', NV.HOTEN N'Tên Nhân Viên',CC.NGAYVAO AS N'Ngày Hiện Tại', CC.TRANGTHAIVAO AS N'CHECK IN VÀO', CC.TRANGTHAIRA AS N'CHECK IN RA'
                        FROM CHAMCONG CC
-                       JOIN HOSONHANVIEN NV ON NV.MANV = CC.MANV";
+                       JOIN HOSONHANVIEN NV ON NV.MANV = CC.MANV
+                        WHERE CAST(CC.NGAYVAO AS DATE) = CAST(GETDATE() AS DATE)
+                        ";
 
                 connection.Open();
                 cmd = new SqlCommand(sql, connection);
@@ -121,7 +123,7 @@ namespace HMresourcemanagementsystem.ChamCong
 
 
         
-        void UpdateDatabase(int maNV, bool trangThaiVao, bool trangThaiRa, DateTime thoiGianVao)
+        void UpdateDatabase(string maNV, bool trangThaiVao, bool trangThaiRa, DateTime thoiGianVao)
         {
             string sql = @"UPDATE CHAMCONG
                    SET TRANGTHAIVAO = @TRANGTHAIVAO, TRANGTHAIRA = @TRANGTHAIRA
@@ -148,7 +150,7 @@ namespace HMresourcemanagementsystem.ChamCong
                 try
                 {
                     // Lấy MANV và THOIGIANVAO từ dòng hiện tại
-                    int maNV = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["Mã Nhân Viên"].Value);
+                    string maNV = Convert.ToString(dataGridView1.Rows[e.RowIndex].Cells["Mã Nhân Viên"].Value);
                     DateTime thoiGianVao = Convert.ToDateTime(dataGridView1.Rows[e.RowIndex].Cells["Ngày Hiện Tại"].Value);
 
                     // Kiểm tra trạng thái

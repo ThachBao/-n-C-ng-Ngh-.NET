@@ -161,48 +161,55 @@ namespace HMresourcemanagementsystem.ChamCong
 
         void timKiemTheoTen()
         {
-            connect.Open();
-            int maNV = int.Parse(txt_maNV.Text);
-            string tenNV = txt_tenNhanVien.Text;
-            string sql = @"SELECT BC.MANV,NV.HoTen,BC.THU,BC.NGAY,BC.THANG,BC.NAM,BC.TRANGTHAI 
-                            FROM BANGCONG BC 
-                            JOIN HOSONHANVIEN NV ON NV.MANV=BC.MANV
-                            WHERE BC.MANV = @MANV OR NV.FULLNAME=@TENNV      
-                            ORDER BY MANV ASC
-                            ";
-            using (cmd = new SqlCommand(sql, connect))
-            {
-                try
+            try 
+            { 
+                connect.Open();
+                string maNV = txt_maNV.Text;
+                string tenNV = txt_tenNhanVien.Text;
+                string sql = @"SELECT BC.MANV,NV.HoTen,BC.THU,BC.NGAY,BC.THANG,BC.NAM,BC.TRANGTHAI 
+                                FROM BANGCONG BC 
+                                JOIN HOSONHANVIEN NV ON NV.MANV=BC.MANV
+                                WHERE BC.MANV = @MANV OR NV.HoTen=@TENNV      
+                                ORDER BY MANV ASC
+                                ";
+                using (cmd = new SqlCommand(sql, connect))
                 {
-                    //Thêm tham số mã nhân viên, tên nhân viên vào 
-                    cmd.Parameters.AddWithValue("@MANV", maNV);
-                    cmd.Parameters.AddWithValue("@TENNV", tenNV);
-                    //SqlDataReader đọc kết quả từ sql
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    try
                     {
-                        // kiểm tra sqldatareader có dữ liệu không 
-                        if (dr.HasRows)
+                        //Thêm tham số mã nhân viên, tên nhân viên vào 
+                        cmd.Parameters.AddWithValue("@MANV", maNV);
+                        cmd.Parameters.AddWithValue("@TENNV", tenNV);
+                        //SqlDataReader đọc kết quả từ sql
+                        using (SqlDataReader dr = cmd.ExecuteReader())
                         {
-                            //tạo table lưu trữ dữ liệu sqldatareader
-                            dt = new DataTable();
-                            dt.Load(dr);
-                            // Hiển thị dữ liệu lên DataGridView 
-                            dataGridView1.DataSource = dt;
+                            // kiểm tra sqldatareader có dữ liệu không 
+                            if (dr.HasRows)
+                            {
+                                //tạo table lưu trữ dữ liệu sqldatareader
+                                dt = new DataTable();
+                                dt.Load(dr);
+                                // Hiển thị dữ liệu lên DataGridView 
+                                dataGridView1.DataSource = dt;
+
+                            }
+                            else
+                            {
+                                MessageBox.Show("Không có dữ liệu cho Mã hoặc Tên đã chọn.");
+                            }
 
                         }
-                        else
-                        {
-                            MessageBox.Show("Không có dữ liệu cho Mã hoặc Tên đã chọn.");
-                        }
-
                     }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error: " + ex.Message);
-                }
-                connect.Close();
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error: " + ex.Message);
+                    }
+                    connect.Close();
 
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
 

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.DataVisualization.Charting;
+
 using static System.Net.WebRequestMethods;
 
 namespace HMresourcemanagementsystem.duAn

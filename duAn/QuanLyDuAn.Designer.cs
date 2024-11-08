@@ -154,6 +154,7 @@
             this.bt_xoa.TabIndex = 15;
             this.bt_xoa.Text = "Xóa";
             this.bt_xoa.UseVisualStyleBackColor = true;
+            this.bt_xoa.Click += new System.EventHandler(this.bt_xoa_Click);
             // 
             // groupBox1
             // 

@@ -9,14 +9,24 @@ GO
 --Bảng phòng ban
 CREATE TABLE PhongBan (
     MaPhong VARCHAR(50) PRIMARY KEY,
-    TenPhong NVARCHAR(100)
+    TenPhong NVARCHAR(100),
+    MoTa NVARCHAR(255)
 );
---Tạo bảng Bộ phận
+
+-- Tạo bảng Bộ phận
 CREATE TABLE BoPhan (
     MaBoPhan VARCHAR(50) PRIMARY KEY,
     TenBoPhan NVARCHAR(100),
-	MaPhong VARCHAR(50) NOT NULL,
-	CONSTRAINT FK_BOPHAN_PHONGBAN FOREIGN KEY (MaPhong) REFERENCES PhongBan(MaPhong)
+    MoTa NVARCHAR(255)
+);
+
+-- Tạo bảng liên kết giữa Bộ phận và Phòng ban
+CREATE TABLE BoPhan_PhongBan (
+    MaBoPhan VARCHAR(50),
+    MaPhong VARCHAR(50),
+    PRIMARY KEY (MaBoPhan, MaPhong),
+    FOREIGN KEY (MaBoPhan) REFERENCES BoPhan(MaBoPhan),
+    FOREIGN KEY (MaPhong) REFERENCES PhongBan(MaPhong)
 );
 
 --Bảng chức vụ:
@@ -271,20 +281,50 @@ GO
 
 -- ================================================================================
 -- INSERT INTO PhongBan (sửa lại mã phòng ban cho tính duy nhất)
-INSERT INTO PhongBan (MaPhong, TenPhong)
+INSERT INTO PhongBan (MaPhong, TenPhong, MoTa)
 VALUES
-('PB01', N'Phòng Kỹ Thuật'), -- Bộ phận kỹ thuật
-('PB02', N'Phòng Kế toán'), --Bộ phận tài chính
-('PB03', N'Phòng Nhân Sự'), --Bộ phận nhân sự
-('PB04', N'Phòng Marketing') --Bộ phận kinh doanh
+('PB01', N'Phòng Kỹ Thuật', N'Chịu trách nhiệm về công nghệ và kỹ thuật.'),
+('PB02', N'Phòng Kế toán', N'Quản lý tài chính và kế toán của công ty.'),
+('PB03', N'Phòng Nhân Sự', N'Tuyển dụng, đào tạo và quản lý nhân sự.'),
+('PB04', N'Phòng Marketing', N'Tiếp thị và phát triển thương hiệu.'),
+('PB05', N'Phòng Nghiên cứu và Phát triển', N'Nghiên cứu và phát triển sản phẩm mới.'),
+('PB06', N'Phòng Hỗ trợ Khách hàng', N'Cung cấp dịch vụ hỗ trợ và chăm sóc khách hàng.'),
+('PB07', N'Phòng Bán hàng', N'Chịu trách nhiệm về doanh thu và bán hàng.'),
+('PB08', N'Phòng IT', N'Quản lý hệ thống công nghệ thông tin.'),
+('PB09', N'Phòng Pháp lý', N'Đảm bảo tuân thủ pháp luật và các quy định.'),
+('PB10', N'Phòng Chiến lược', N'Lập kế hoạch chiến lược dài hạn cho công ty.');
 
-INSERT INTO BoPhan (MaBoPhan, TenBoPhan,MaPhong)
+INSERT INTO BoPhan (MaBoPhan, TenBoPhan, MoTa)
 VALUES
-('BP01', N'Bộ Phận IT','PB01'),
-('BP02', N'Bộ Phận Tiếp Thị','PB04'),
-('BP03', N'Bộ Phận Tuyển Dụng','PB03'),
-('BP04', N'Bộ Phận Tài chính','PB02')
+('BP01', N'Bộ Phận IT', N'Cung cấp giải pháp công nghệ cho doanh nghiệp.'),
+('BP02', N'Bộ Phận Tiếp Thị', N'Quản lý hoạt động tiếp thị và quảng cáo.'),
+('BP03', N'Bộ Phận Tuyển Dụng', N'Tìm kiếm và tuyển dụng ứng viên.'),
+('BP04', N'Bộ Phận Tài Chính', N'Quản lý ngân sách và tài chính.'),
+('BP05', N'Bộ Phận Nghiên cứu và Phát triển', N'Nghiên cứu và phát triển sản phẩm mới.'),
+('BP06', N'Bộ Phận Hỗ trợ Khách hàng', N'Giải quyết vấn đề và hỗ trợ khách hàng.'),
+('BP07', N'Bộ Phận Bán hàng', N'Thực hiện các hoạt động bán hàng và chăm sóc khách hàng.'),
+('BP08', N'Bộ Phận Pháp lý', N'Đảm bảo tuân thủ các quy định pháp luật.'),
+('BP09', N'Bộ Phận Chiến lược', N'Lập kế hoạch và chiến lược kinh doanh.'),
+('BP10', N'Bộ Phận Đào tạo', N'Tổ chức các khóa đào tạo cho nhân viên.');
 
+INSERT INTO BoPhan_PhongBan (MaBoPhan, MaPhong)
+VALUES
+('BP01', 'PB01'), -- Bộ Phận IT có Phòng Kỹ Thuật
+('BP01', 'PB08'), -- Bộ Phận IT cũng có Phòng IT
+('BP02', 'PB04'), -- Bộ Phận Tiếp Thị có Phòng Marketing
+('BP03', 'PB03'), -- Bộ Phận Tuyển Dụng có Phòng Nhân Sự
+('BP04', 'PB02'), -- Bộ Phận Tài Chính có Phòng Kế toán
+('BP05', 'PB05'), -- Bộ Phận Nghiên cứu và Phát triển có Phòng Nghiên cứu và Phát triển
+('BP06', 'PB06'), -- Bộ Phận Hỗ trợ Khách hàng có Phòng Hỗ trợ Khách hàng
+('BP07', 'PB07'), -- Bộ Phận Bán hàng có Phòng Bán hàng
+('BP08', 'PB09'), -- Bộ Phận Pháp lý có Phòng Pháp lý
+('BP09', 'PB10'), -- Bộ Phận Chiến lược có Phòng Chiến lược
+('BP02', 'PB02'), -- Bộ Phận Tiếp Thị có thể liên kết tới Phòng Kế toán
+('BP03', 'PB04'), -- Bộ Phận Tuyển Dụng cũng có thể liên kết tới Phòng Marketing
+('BP06', 'PB04'), -- Bộ Phận Hỗ trợ Khách hàng có thể làm việc với Phòng Marketing
+('BP07', 'PB05'); -- Bộ Phận Bán hàng có thể có liên kết tới Phòng Nghiên cứu và Phát triển
+
+SELECT * FROM BoPhan
 -- INSERT INTO ChucVu (sửa mã chức vụ duy nhất)
 INSERT INTO ChucVu (MaChucVu, TenChucVu)
 VALUES
@@ -829,6 +869,9 @@ drop table Luong
 drop table PhanCong
 drop table PhongBan
 drop table TrinhDoNangLuc
+
+
+
 SELECT DVDA.MaDauViec, DVDA.TenDauViec
 FROM DAUVIECDUAN DVDA
 WHERE DVDA.TenDauViec = N'Phân tích yêu cầu' AND DVDA.MaDuAn='DA01'

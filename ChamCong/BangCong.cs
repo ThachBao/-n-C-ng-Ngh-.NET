@@ -39,7 +39,7 @@ namespace HMresourcemanagementsystem.ChamCong
             {
                 string sql = @"SELECT BC.MANV, NV.HoTen, BC.THU,BC.NGAY,BC.THANG,BC.NAM,BC.TRANGTHAI
                          FROM BANGCONG BC 
-                        JOIN HOSONHANVIEN NV ON NV.MANV = BC.MANV
+                        JOIN NHANVIEN NV ON NV.MANV = BC.MANV
                         ORDER BY BC.NGAY ASC, BC.THANG ASC, BC.NAM ASC
                          ";
                 cmd = new SqlCommand(sql, connect);
@@ -80,7 +80,7 @@ namespace HMresourcemanagementsystem.ChamCong
                 // Nếu tất cả checkbox được chọn (ngày, tháng, năm)
                 sql = @"SELECT BC.MANV, NV.HoTen, BC.THU, BC.NGAY, BC.THANG, BC.NAM, BC.TRANGTHAI
                 FROM BANGCONG BC
-                JOIN HOSONHANVIEN NV ON NV.MANV = BC.MANV
+                JOIN NHANVIEN NV ON NV.MANV = BC.MANV
                 WHERE BC.NGAY = @NGAY AND BC.THANG = @THANG AND BC.NAM = @NAM
                 ORDER BY BC.MANV ASC";
                 Load_ngayThangNam(sql, ngay, thang, nam);
@@ -90,7 +90,7 @@ namespace HMresourcemanagementsystem.ChamCong
                 // Nếu chỉ chọn tháng và năm (bỏ qua ngày)
                 sql = @"SELECT BC.MANV, NV.HoTen, BC.THU, BC.NGAY, BC.THANG, BC.NAM, BC.TRANGTHAI
                 FROM BANGCONG BC
-                JOIN HOSONHANVIEN NV ON NV.MANV = BC.MANV
+                JOIN NHANVIEN NV ON NV.MANV = BC.MANV
                 WHERE BC.THANG = @THANG AND BC.NAM = @NAM
                 ORDER BY BC.MANV ASC";
                 Load_ngayThangNam(sql, null, thang, nam); // Bỏ qua ngày
@@ -100,7 +100,7 @@ namespace HMresourcemanagementsystem.ChamCong
                 // Nếu chỉ chọn năm
                 sql = @"SELECT BC.MANV, NV.HoTen, BC.THU, BC.NGAY, BC.THANG, BC.NAM, BC.TRANGTHAI
                 FROM BANGCONG BC
-                JOIN HOSONHANVIEN NV ON NV.MANV = BC.MANV
+                JOIN NHANVIEN NV ON NV.MANV = BC.MANV
                 WHERE BC.NAM = @NAM
                 ORDER BY BC.MANV ASC";
                 Load_ngayThangNam(sql, null, null, nam); // Bỏ qua ngày và tháng
@@ -168,7 +168,7 @@ namespace HMresourcemanagementsystem.ChamCong
                 string tenNV = txt_tenNhanVien.Text;
                 string sql = @"SELECT BC.MANV,NV.HoTen,BC.THU,BC.NGAY,BC.THANG,BC.NAM,BC.TRANGTHAI 
                                 FROM BANGCONG BC 
-                                JOIN HOSONHANVIEN NV ON NV.MANV=BC.MANV
+                                JOIN NHANVIEN NV ON NV.MANV=BC.MANV
                                 WHERE BC.MANV = @MANV OR NV.HoTen=@TENNV      
                                 ORDER BY MANV ASC
                                 ";

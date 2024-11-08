@@ -30,6 +30,8 @@
         {
             this.treeView_phongBan = new System.Windows.Forms.TreeView();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.txt_maPhongBan = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.txt_tenPhongBan = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.bt_them = new System.Windows.Forms.Button();
@@ -45,8 +47,7 @@
             this.bt_themNhanVien = new System.Windows.Forms.Button();
             this.bt_xoaNhanVien = new System.Windows.Forms.Button();
             this.bt_suaNhanVien = new System.Windows.Forms.Button();
-            this.label7 = new System.Windows.Forms.Label();
-            this.txt_maPhongBan = new System.Windows.Forms.TextBox();
+            this.bt_exit = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -73,6 +74,24 @@
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Phòng Ban";
+            // 
+            // txt_maPhongBan
+            // 
+            this.txt_maPhongBan.Location = new System.Drawing.Point(192, 440);
+            this.txt_maPhongBan.Multiline = true;
+            this.txt_maPhongBan.Name = "txt_maPhongBan";
+            this.txt_maPhongBan.Size = new System.Drawing.Size(155, 35);
+            this.txt_maPhongBan.TabIndex = 3;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.Location = new System.Drawing.Point(45, 455);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(119, 20);
+            this.label7.TabIndex = 2;
+            this.label7.Text = "Mã Phòng Ban";
             // 
             // txt_tenPhongBan
             // 
@@ -214,29 +233,22 @@
             this.bt_suaNhanVien.Text = "Sửa";
             this.bt_suaNhanVien.UseVisualStyleBackColor = true;
             // 
-            // label7
+            // bt_exit
             // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.Location = new System.Drawing.Point(45, 455);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(119, 20);
-            this.label7.TabIndex = 2;
-            this.label7.Text = "Mã Phòng Ban";
-            // 
-            // txt_maPhongBan
-            // 
-            this.txt_maPhongBan.Location = new System.Drawing.Point(192, 440);
-            this.txt_maPhongBan.Multiline = true;
-            this.txt_maPhongBan.Name = "txt_maPhongBan";
-            this.txt_maPhongBan.Size = new System.Drawing.Size(155, 35);
-            this.txt_maPhongBan.TabIndex = 3;
+            this.bt_exit.Location = new System.Drawing.Point(761, 538);
+            this.bt_exit.Name = "bt_exit";
+            this.bt_exit.Size = new System.Drawing.Size(201, 56);
+            this.bt_exit.TabIndex = 13;
+            this.bt_exit.Text = "Thoát";
+            this.bt_exit.UseVisualStyleBackColor = true;
+            this.bt_exit.Click += new System.EventHandler(this.bt_exit_Click);
             // 
             // QuanLyPhongBan
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1132, 645);
+            this.Controls.Add(this.bt_exit);
             this.Controls.Add(this.bt_suaNhanVien);
             this.Controls.Add(this.bt_xoaNhanVien);
             this.Controls.Add(this.bt_themNhanVien);
@@ -252,6 +264,7 @@
             this.Controls.Add(this.groupBox1);
             this.Name = "QuanLyPhongBan";
             this.Text = "QuanLyPhongBan";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.QuanLyPhongBan_FormClosed);
             this.Load += new System.EventHandler(this.QuanLyPhongBan_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -281,5 +294,6 @@
         private System.Windows.Forms.Button bt_suaNhanVien;
         private System.Windows.Forms.TextBox txt_maPhongBan;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button bt_exit;
     }
 }

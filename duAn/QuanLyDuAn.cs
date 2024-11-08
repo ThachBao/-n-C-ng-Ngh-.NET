@@ -302,6 +302,67 @@ namespace HMresourcemanagementsystem.duAn
         {
             //thoát của bảo :)))
         }
+
+        private void bt_xoa_Click(object sender, EventArgs e)
+        {
+            // Lấy mã dự án từ ô văn bản
+            string maDuAn = txt_maDuAn.Text;
+
+            // Xác nhận trước khi xóa
+            var confirmResult = MessageBox.Show("Bạn có chắc chắn muốn xóa dự án này?",
+                                                 "Xác nhận xóa!",
+                                                 MessageBoxButtons.YesNo);
+            if (confirmResult == DialogResult.Yes)
+            {
+                connection.Open();
+                try
+                {
+                    // Bắt đầu giao dịch
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        // Xóa các bản ghi liên quan trong DAUVIECDUAN
+                        string sqlDelete = @"DELETE FROM DAUVIECDUAN WHERE MaDuAn = @maDuAn";
+                        using (SqlCommand cmd = new SqlCommand(sqlDelete, connection, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@maDuAn", maDuAn);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // Xóa dự án
+                        string sqlDeleteDuAn = @"DELETE FROM DuAn WHERE MaDuAn = @maDuAn";
+                        using (SqlCommand cmd = new SqlCommand(sqlDeleteDuAn, connection, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@maDuAn", maDuAn);
+                            int rowsAffected = cmd.ExecuteNonQuery();
+                            if (rowsAffected > 0)
+                            {
+                                MessageBox.Show("Xóa dự án thành công.");
+                                
+                                
+                            }
+                            else
+                            {
+                                MessageBox.Show("Không tìm thấy dự án để xóa.");
+                            }
+                        }
+
+                        // Commit giao dịch
+                        transaction.Commit();
+                        connection.Close();
+                        load_dataGridView();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Có lỗi xảy ra: " + ex.Message);
+                }
+                finally
+                {
+                    connection.Close(); // Đóng kết nối
+                }
+            }
+
+        }
     }
 
     

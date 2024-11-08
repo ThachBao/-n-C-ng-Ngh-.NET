@@ -30,7 +30,7 @@ namespace HMresourcemanagementsystem.ChamCong
             {
                 string sql = @"SELECT CC.ID_CHAMCONG, CC.MANV AS N'Mã Nhân Viên', NV.HOTEN N'Tên Nhân Viên',CC.NGAYVAO AS N'Ngày Hiện Tại', CC.TRANGTHAIVAO AS N'CHECK IN VÀO', CC.TRANGTHAIRA AS N'CHECK IN RA'
                        FROM CHAMCONG CC
-                       JOIN HOSONHANVIEN NV ON NV.MANV = CC.MANV
+                       JOIN NHANVIEN NV ON NV.MANV = CC.MANV
                         WHERE CAST(CC.NGAYVAO AS DATE) = CAST(GETDATE() AS DATE)
                         ";
 
@@ -65,7 +65,7 @@ namespace HMresourcemanagementsystem.ChamCong
             // Truy vấn SQL
             string sql = @"SELECT CC.MANV AS N'Mã Nhân Viên',NV.HOTEN N'Tên Nhân Viên',CC.NGAYVAO AS N'Ngày Hiện Tại', CC.TRANGTHAIVAO AS N'CHECK IN VÀO',CC.TRANGTHAIRA AS N'CHECK IN RA'
                                FROM CHAMCONG CC
-                               JOIN  HOSONHANVIEN NV ON NV.MANV = CC.MANV
+                               JOIN  NHANVIEN NV ON NV.MANV = CC.MANV
                                 ";
 
             // Tạo đối tượng DataTable để lưu trữ dữ liệu từ database

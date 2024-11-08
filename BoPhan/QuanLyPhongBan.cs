@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HMresourcemanagementsystem.BoPhan;
+using HMresourcemanagementsystem.duAn;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -135,39 +137,51 @@ namespace HMresourcemanagementsystem
         }
         private void bt_them_Click(object sender, EventArgs e)
         {
+            string tenPhongBan = txt_tenPhongBan.Text.Trim();
+            string maPhongBan = txt_maPhongBan.Text.Trim();
             if (!kiemTraTrungTenPhongBan(txt_tenPhongBan.Text))
             {
-
-                treeView_phongBan.Nodes.Add(txt_tenPhongBan.Text);
-                cb_phongBan.Items.Add(txt_tenPhongBan.Text);
+                TreeNode phongBanNode = new TreeNode(tenPhongBan);
+                treeView_phongBan.Nodes.Add(phongBanNode);
+                if (!cb_phongBan.Items.Contains(tenPhongBan))
+                {
+                    cb_phongBan.Items.Add(tenPhongBan);
+                }
                 connection.Open();
+                // Thêm phòng ban vào cơ sở dữ liệu
                 try
                 {
-                    string sql = @"INSERT INTO PHONGBAN (MaPhong,TenPhong) VALUES (@MAPHONGBAN,@TENPHONGBAN)";
-                    using (cmd = new SqlCommand(sql, connection))
+                    using (SqlConnection connection = new connection().con) // Sử dụng `using` để tự động quản lý kết nối
                     {
-                        cmd.Parameters.AddWithValue("@MAPHONGBAN", txt_maPhongBan.Text);
-                        cmd.Parameters.AddWithValue("@TENPHONGBAN", txt_tenPhongBan.Text);
-
-                        cmd.ExecuteNonQuery();
-
+                        connection.Open();
+                        string sql = @"INSERT INTO PHONGBAN (MaPhong, TenPhong) VALUES (@MAPHONGBAN, @TENPHONGBAN)";
+                        using (SqlCommand cmd = new SqlCommand(sql, connection))
+                        {
+                            cmd.Parameters.AddWithValue("@MAPHONGBAN", maPhongBan);
+                            cmd.Parameters.AddWithValue("@TENPHONGBAN", tenPhongBan);
+                            cmd.ExecuteNonQuery();
+                        }
                     }
-                    connection.Close();
+
+                    MessageBox.Show("Thêm phòng ban thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (SqlException sqlEx)
+                {
+                    MessageBox.Show("Lỗi SQL: " + sqlEx.Message, "Thông báo lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
-                }
-                finally
-                {
-                    connection.Close();
+                    MessageBox.Show("Đã xảy ra lỗi: " + ex.Message, "Thông báo lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             else
-                MessageBox.Show("Phòng Ban Đã Tồn Tại!");
+            {
+                MessageBox.Show("Phòng Ban Đã Tồn Tại!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            // Reset TextBox
             txt_tenPhongBan.Text = "";
             txt_tenPhongBan.Focus();
-
         }
         private void LoadNhanVienForPhongBan(TreeNode phongBanNode)
         {
@@ -175,7 +189,7 @@ namespace HMresourcemanagementsystem
             {
                 string sqlNhanVien = @"
                                             SELECT HSNV.HOTEN, HSNV.MANV
-                                            FROM HOSONHANVIEN HSNV
+                                            FROM NHANVIEN HSNV
                                             JOIN PHONGBAN PB ON PB.MAPHONG = HSNV.MAPHONG
                                             WHERE PB.TENPHONG = @VALUE";
 
@@ -283,7 +297,7 @@ namespace HMresourcemanagementsystem
             {
                 connection.Open();
                 string sql = @"SELECT HSNV.MANV,HSNV.HOTEN,CV.MACHUCVU,CV.TENCHUCVU,PB.TENPHONG 
-                                FROM HOSONHANVIEN HSNV
+                                FROM NHANVIEN HSNV
                                 JOIN CHUCVU CV ON CV.MACHUCVU=HSNV.MACHUCVU
                                 JOIN PHONGBAN PB ON PB.MAPHONG=HSNV.MAPHONG
                                 WHERE MANV = @MANV";
@@ -321,7 +335,57 @@ namespace HMresourcemanagementsystem
             }
         }
 
-        
+        private void bt_exit_Click(object sender, EventArgs e)
+        {
+            // Hiển thị hộp thoại xác nhận
+            DialogResult result = MessageBox.Show("Bạn có muốn quay lại Quản lý Bộ phận?",
+                                                   "Xác nhận",
+                                                   MessageBoxButtons.YesNoCancel,
+                                                   MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                // Nếu người dùng chọn "Yes", quay lại form QuanLyBoPhan
+                if (this.Owner is QuanLyBoPhan ql)
+                {
+                    // Gọi phương thức ReloadDataGridView để cập nhật dữ liệu
+                    ql.ReloadDataGridView();
+                }
+                this.Close(); // Đóng form hiện tại
+            }
+            else if (result == DialogResult.No)
+            {
+                // Nếu người dùng chọn "No", thoát ứng dụng
+                Application.Exit(); // Thoát ứng dụng
+            }
+            else if (result == DialogResult.Cancel)
+            {
+                // Nếu người dùng chọn "Cancel", chỉ cần không làm gì và giữ lại form
+            }
+
+        }
+        private void OpenPhongBanForm()
+        {
+            QuanLyPhongBan phongBanForm = new QuanLyPhongBan();
+            phongBanForm.Owner = this; // Thiết lập Owner
+            phongBanForm.Show();
+        }
+
+        private void QuanLyPhongBan_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            try
+            {
+                // Kiểm tra xem Owner có phải là QuanLyBoPhan không
+                if (this.Owner is QuanLyBoPhan ql)
+                {
+                    ql.ReloadDataGridView(); // Gọi phương thức để tải lại dữ liệu
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Đã xảy ra lỗi: " + ex.Message, "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     }
 }
 

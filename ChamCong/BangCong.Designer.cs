@@ -59,19 +59,20 @@
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(12, 311);
+            this.dataGridView1.Location = new System.Drawing.Point(109, 302);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.Size = new System.Drawing.Size(1171, 455);
             this.dataGridView1.TabIndex = 0;
+            this.dataGridView1.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dataGridView1_CellFormatting);
             this.dataGridView1.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValueChanged);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Times New Roman", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(507, 53);
+            this.label1.Location = new System.Drawing.Point(604, 44);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(149, 34);
             this.label1.TabIndex = 1;
@@ -89,7 +90,7 @@
             // 
             // DTP
             // 
-            this.DTP.Location = new System.Drawing.Point(148, 36);
+            this.DTP.Location = new System.Drawing.Point(161, 40);
             this.DTP.Name = "DTP";
             this.DTP.Size = new System.Drawing.Size(195, 22);
             this.DTP.TabIndex = 4;
@@ -111,7 +112,7 @@
             this.tùyChọnToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1351, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(1397, 30);
             this.menuStrip1.TabIndex = 6;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -128,14 +129,14 @@
             // quayLạiToolStripMenuItem
             // 
             this.quayLạiToolStripMenuItem.Name = "quayLạiToolStripMenuItem";
-            this.quayLạiToolStripMenuItem.Size = new System.Drawing.Size(304, 26);
+            this.quayLạiToolStripMenuItem.Size = new System.Drawing.Size(351, 26);
             this.quayLạiToolStripMenuItem.Text = "Quay Lại Danh Sách Chấm Công";
             this.quayLạiToolStripMenuItem.Click += new System.EventHandler(this.quayLạiToolStripMenuItem_Click);
             // 
             // menuChínhToolStripMenuItem
             // 
             this.menuChínhToolStripMenuItem.Name = "menuChínhToolStripMenuItem";
-            this.menuChínhToolStripMenuItem.Size = new System.Drawing.Size(304, 26);
+            this.menuChínhToolStripMenuItem.Size = new System.Drawing.Size(351, 26);
             this.menuChínhToolStripMenuItem.Text = "Quay Lại Trang Chủ";
             // 
             // contextMenuStrip1
@@ -152,7 +153,7 @@
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.DTP);
             this.groupBox1.Controls.Add(this.bt_timKiemTheoNgay);
-            this.groupBox1.Location = new System.Drawing.Point(34, 122);
+            this.groupBox1.Location = new System.Drawing.Point(131, 113);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(572, 141);
             this.groupBox1.TabIndex = 8;
@@ -199,7 +200,7 @@
             this.groupBox2.Controls.Add(this.bt_timKiemTheoTen);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Location = new System.Drawing.Point(649, 122);
+            this.groupBox2.Location = new System.Drawing.Point(746, 113);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(556, 141);
             this.groupBox2.TabIndex = 9;
@@ -250,7 +251,7 @@
             // 
             // btn_exit
             // 
-            this.btn_exit.Location = new System.Drawing.Point(888, 794);
+            this.btn_exit.Location = new System.Drawing.Point(947, 794);
             this.btn_exit.Name = "btn_exit";
             this.btn_exit.Size = new System.Drawing.Size(251, 72);
             this.btn_exit.TabIndex = 10;
@@ -261,7 +262,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1351, 904);
+            this.ClientSize = new System.Drawing.Size(1397, 934);
             this.Controls.Add(this.btn_exit);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);

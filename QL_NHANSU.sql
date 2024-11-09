@@ -123,6 +123,7 @@ CREATE TABLE BANGCONG
     NAM INT,
     ID_CHAMCONG CHAR(20),
     TRANGTHAI NVARCHAR(20),
+	MOTA NVARCHAR(255),
     CONSTRAINT PK_BANGCONG PRIMARY KEY (ID_BANGCONG),
     CONSTRAINT FK_BANGCONG_EMPLOYEE FOREIGN KEY (MANV) REFERENCES NhanVien(MANV),
     CONSTRAINT FK_BANGCONG_CHAMCONG FOREIGN KEY (ID_CHAMCONG, MANV) REFERENCES CHAMCONG(ID_CHAMCONG, MANV),
@@ -175,6 +176,8 @@ BEGIN
     FROM 
         INSERTED i;  -- Lấy dữ liệu từ bảng ảo INSERTED (các bản ghi mới được thêm)
 END;
+GO
+
 CREATE TRIGGER trg_UpdateTrangThai
 ON CHAMCONG
 AFTER INSERT, UPDATE
@@ -192,6 +195,56 @@ BEGIN
     FROM BANGCONG BG
     INNER JOIN inserted I ON I.ID_CHAMCONG = BG.ID_CHAMCONG
     INNER JOIN CHAMCONG CH ON I.ID_CHAMCONG = CH.ID_CHAMCONG AND I.MANV = CH.MANV;
+END;
+GO
+CREATE TABLE NgayLe (
+    ID INT PRIMARY KEY IDENTITY(1,1),
+    NGAY INT NOT NULL,
+    THANG INT NOT NULL,
+	NAM INT NOT NULL,
+    TENLE NVARCHAR(100) NOT NULL
+);
+GO
+CREATE TRIGGER trg_CheckNgayLe
+ON NgayLe
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Kiểm tra xem ngày lễ đã tồn tại hay chưa
+    IF NOT EXISTS (
+        SELECT 1
+        FROM NgayLe NL
+        INNER JOIN inserted I ON NL.NGAY = I.NGAY AND NL.THANG = I.THANG AND NL.NAM = I.NAM
+    )
+    BEGIN
+        -- Nếu không tồn tại, cho phép thêm
+        INSERT INTO NgayLe (NGAY, THANG, NAM, TENLE)
+        SELECT NGAY, THANG, NAM, TENLE
+        FROM inserted;
+    END
+    ELSE
+    BEGIN
+        -- Nếu đã tồn tại, không thêm và có thể thông báo
+        RAISERROR('Ngày lễ đã tồn tại trong bảng NgayLe.', 16, 1);
+    END
+END;
+GO
+--UPDATE MÔ TẢ TRONG BẢNG CÔNG 
+CREATE TRIGGER trg_UpdateMota
+ON BANGCONG
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Cập nhật trường MOTA trong bảng BANGCONG
+    UPDATE BG
+    SET MOTA = NL.TenLe
+    FROM BANGCONG BG
+    INNER JOIN inserted I ON BG.ID_BANGCONG = I.ID_BANGCONG
+    INNER JOIN NgayLe NL ON I.NGAY = NL.NGAY AND I.THANG = NL.THANG AND I.NAM = NL.NAM
 END;
 GO
 
@@ -855,7 +908,7 @@ SELECT * FROM PhanCong
 SELECT * FROM PhongBan
 SELECT * FROM TrinhDoNangLuc
 SELECT * FROM BANGCONG
-
+SELECT * FROM NgayLe
 
 drop table BaoHiem
 drop table BoPhan
@@ -869,7 +922,7 @@ drop table Luong
 drop table PhanCong
 drop table PhongBan
 drop table TrinhDoNangLuc
-
+drop table NgayLe
 
 
 SELECT DVDA.MaDauViec, DVDA.TenDauViec

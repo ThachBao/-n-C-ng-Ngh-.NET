@@ -213,7 +213,7 @@ namespace HMresourcemanagementsystem.ChamCong
             connect.Open();
             try
             {
-                string sql = @"SELECT BC.MANV, NV.HoTen, BC.THU, BC.NGAY, BC.THANG, BC.NAM, BC.TRANGTHAI,BC.MOTA 
+                string sql = @"SELECT BC.MANV, NV.HoTen, BC.THU, BC.NGAY, BC.THANG, BC.NAM, BC.TRANGTHAI,BC.MOTA ,BC.TONGNGAYCONG
                                FROM BANGCONG BC 
                                JOIN NHANVIEN NV ON NV.MANV = BC.MANV
                                ORDER BY BC.NGAY ASC, BC.THANG ASC, BC.NAM ASC";

@@ -113,6 +113,7 @@ BEGIN
     INNER JOIN inserted i ON cc.ID_CHAMCONG = i.ID_CHAMCONG AND cc.MANV = i.MANV;
 END;
 GO
+
 -- Tạo bảng BANGCONG
 CREATE TABLE BANGCONG
 (
@@ -124,6 +125,7 @@ CREATE TABLE BANGCONG
     ID_CHAMCONG CHAR(20),
     TRANGTHAI NVARCHAR(20),
 	MOTA NVARCHAR(255),
+	TONGNGAYCONG INT,
     CONSTRAINT PK_BANGCONG PRIMARY KEY (ID_BANGCONG),
     CONSTRAINT FK_BANGCONG_EMPLOYEE FOREIGN KEY (MANV) REFERENCES NhanVien(MANV),
     CONSTRAINT FK_BANGCONG_CHAMCONG FOREIGN KEY (ID_CHAMCONG, MANV) REFERENCES CHAMCONG(ID_CHAMCONG, MANV),
@@ -157,24 +159,28 @@ GO
 
 
 
---chay trigger de them du lieu vao bang cong 
 CREATE TRIGGER THEMDULIEUVAOBANGCONG
 ON CHAMCONG
 FOR INSERT
 AS
 BEGIN
-    -- Chèn dữ liệu vào bảng BANGCONG với các bản ghi vừa được thêm vào bảng CHAMCONG
-    INSERT INTO BANGCONG (ID_BANGCONG, MANV, NGAY, THANG, NAM, ID_CHAMCONG)
-    SELECT 
-        NEWID(),  -- Sinh ID_BANGCONG mới
-        i.MANV,  -- Lấy MANV từ bảng ảo INSERTED
-        DAY(GETDATE()) AS NGAY,  -- Lấy ngày từ THOIGIANVAO trong bảng ảo
-        MONTH(GETDATE()) AS THANG,  -- Lấy tháng từ THOIGIANVAO trong bảng ảo
-        YEAR(GETDATE()) AS NAM,  -- Lấy năm từ THOIGIANVAO trong bảng ảo
-        i.ID_CHAMCONG  -- Lấy ID_CHAMCONG từ bảng ảo INSERTED
-		-- Giá trị cho cột TRANGTHAI
-    FROM 
-        INSERTED i;  -- Lấy dữ liệu từ bảng ảo INSERTED (các bản ghi mới được thêm)
+    BEGIN TRY
+        -- Chèn dữ liệu vào bảng BANGCONG với các bản ghi vừa được thêm vào bảng CHAMCONG
+        INSERT INTO BANGCONG (ID_BANGCONG, MANV, NGAY, THANG, NAM, ID_CHAMCONG)
+        SELECT 
+            NEWID(),  -- Sinh ID_BANGCONG mới
+            i.MANV,  -- Lấy MANV từ bảng ảo INSERTED
+            DAY(GETDATE()) AS NGAY,  -- Lấy ngày từ THOIGIANVAO trong bảng ảo
+            MONTH(GETDATE()) AS THANG,  -- Lấy tháng từ THOIGIANVAO trong bảng ảo
+            YEAR(GETDATE()) AS NAM,  -- Lấy năm từ THOIGIANVAO trong bảng ảo
+            i.ID_CHAMCONG  -- Lấy ID_CHAMCONG từ bảng ảo INSERTED
+        FROM 
+            INSERTED i;  -- Lấy dữ liệu từ bảng ảo INSERTED (các bản ghi mới được thêm)
+    END TRY
+    BEGIN CATCH
+        -- In thông báo lỗi
+        PRINT 'Lỗi: ' + ERROR_MESSAGE();
+    END CATCH
 END;
 GO
 
@@ -188,13 +194,40 @@ BEGIN
     -- Cập nhật TRANGTHAI trong bảng BANGCONG
     UPDATE BANGCONG
     SET TRANGTHAI = CASE 
-        WHEN CH.TRANGTHAIVAO = 0 OR CH.TRANGTHAIRA = 0 THEN N'Chưa Hoàn Thành'
-		WHEN CH.TRANGTHAIVAO =NULL OR CH.TRANGTHAIRA = NULL THEN N'Chưa Hoàn Thành'
+        WHEN CH.TRANGTHAIVAO = 0 AND CH.TRANGTHAIRA = 0 THEN N'Chưa Hoàn Thành'
+		WHEN CH.TRANGTHAIVAO = 1 AND CH.TRANGTHAIRA = 0 THEN N'Chưa Hoàn Thành'
+		WHEN CH.TRANGTHAIVAO = 0 AND CH.TRANGTHAIRA = 1 THEN N'Chưa Hoàn Thành'
+		WHEN CH.TRANGTHAIVAO IS NULL AND CH.TRANGTHAIRA IS NULL THEN N'Chưa Hoàn Thành'
         ELSE N'Hoàn Thành'
     END
     FROM BANGCONG BG
     INNER JOIN inserted I ON I.ID_CHAMCONG = BG.ID_CHAMCONG
     INNER JOIN CHAMCONG CH ON I.ID_CHAMCONG = CH.ID_CHAMCONG AND I.MANV = CH.MANV;
+END;
+GO
+CREATE TRIGGER trg_TinhTongNgayCong
+ON BANGCONG
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Cập nhật tổng số ngày công dựa trên trạng thái
+    UPDATE BG
+    SET TONGNGAYCONG = (
+        SELECT 
+            SUM(CASE 
+                WHEN TRANGTHAI = 'Hoàn Thành' THEN 1 
+                WHEN TRANGTHAI = 'Không Hoàn Thành' THEN -1 
+                ELSE 0 
+            END)
+        FROM BANGCONG
+        WHERE MaNV = BG.MaNV
+        AND THANG = BG.THANG
+        AND NAM = BG.NAM
+    )
+    FROM BANGCONG BG
+    INNER JOIN inserted I ON BG.MaNV = I.MaNV AND BG.THANG = I.THANG AND BG.NAM = I.NAM;
 END;
 GO
 CREATE TABLE NgayLe (
@@ -231,7 +264,6 @@ BEGIN
     END
 END;
 GO
---UPDATE MÔ TẢ TRONG BẢNG CÔNG 
 CREATE TRIGGER trg_UpdateMota
 ON BANGCONG
 AFTER INSERT, UPDATE
@@ -239,12 +271,32 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Cập nhật trường MOTA trong bảng BANGCONG
+    -- Chỉ thực hiện cập nhật nếu bảng INSERTED có dữ liệu
+    IF EXISTS (SELECT 1 FROM inserted)
+    BEGIN
+        -- Cập nhật trường MOTA trong bảng BANGCONG
+        UPDATE BG
+        SET MOTA = NL.TenLe
+        FROM BANGCONG BG
+        INNER JOIN inserted I ON BG.ID_BANGCONG = I.ID_BANGCONG
+        INNER JOIN NgayLe NL ON I.NGAY = NL.NGAY AND I.THANG = NL.THANG AND I.NAM = NL.NAM
+        WHERE BG.MOTA <> NL.TenLe;  -- Chỉ cập nhật khi cần thiết
+    END
+END;
+GO
+CREATE TRIGGER trg_UpdateMota2
+ON BANGCONG
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Cập nhật trường MOTA nếu ngày là Chủ nhật
     UPDATE BG
-    SET MOTA = NL.TenLe
+    SET MOTA = N'Chủ nhật'
     FROM BANGCONG BG
     INNER JOIN inserted I ON BG.ID_BANGCONG = I.ID_BANGCONG
-    INNER JOIN NgayLe NL ON I.NGAY = NL.NGAY AND I.THANG = NL.THANG AND I.NAM = NL.NAM
+    WHERE I.NGAY = 1 AND I.THANG = 1;  -- Thay đổi điều kiện này để kiểm tra ngày Chủ nhật
 END;
 GO
 
@@ -924,17 +976,46 @@ drop table PhongBan
 drop table TrinhDoNangLuc
 drop table NgayLe
 
-
-SELECT DVDA.MaDauViec, DVDA.TenDauViec
-FROM DAUVIECDUAN DVDA
-WHERE DVDA.TenDauViec = N'Phân tích yêu cầu' AND DVDA.MaDuAn='DA01'
---function
 --mỗi ngày import vào mỗi nhân viên
-DECLARE @CurrentDate DATETIME = GETDATE();
+CREATE PROCEDURE dbo.ThemNhanVienVaChamCong
+AS
+BEGIN
+    DECLARE @CurrentDate DATETIME = GETDATE();
+    DECLARE @Result NVARCHAR(100);
+    DECLARE @ID_CHAMCONG NVARCHAR(20);
 
-INSERT INTO CHAMCONG (ID_CHAMCONG, NGAYVAO, MANV)
-SELECT 
-    LEFT(CAST(MANV AS CHAR(10)) + FORMAT(@CurrentDate, 'MMdd'), 20), -- Chỉ lấy phần cần thiết
-    @CurrentDate, 
-    MANV
-FROM NhanVien; -- Lấy tất cả mã nhân viên từ bảng HoSoNhanVien
+    BEGIN TRY
+        -- Thêm dữ liệu vào bảng CHAMCONG
+        DECLARE cur CURSOR FOR 
+        SELECT MANV FROM NhanVien;
+
+        OPEN cur;
+        FETCH NEXT FROM cur INTO @ID_CHAMCONG;
+
+        WHILE @@FETCH_STATUS = 0
+        BEGIN
+            DECLARE @NewID NVARCHAR(50) = LEFT(CAST(@ID_CHAMCONG AS CHAR(10)) + FORMAT(@CurrentDate, 'MMdd'), 20);
+
+            -- Kiểm tra sự tồn tại của ID_CHAMCONG
+            IF NOT EXISTS (SELECT 1 FROM CHAMCONG WHERE ID_CHAMCONG = @NewID)
+            BEGIN
+                INSERT INTO CHAMCONG (ID_CHAMCONG, NGAYVAO, MANV)
+                VALUES (@NewID, @CurrentDate, @ID_CHAMCONG);
+            END
+
+            FETCH NEXT FROM cur INTO @ID_CHAMCONG;
+        END
+
+        CLOSE cur;
+        DEALLOCATE cur;
+
+        SET @Result = N'Thêm nhân viên vào bảng CHAMCONG thành công.';
+    END TRY
+    BEGIN CATCH
+        SET @Result = N'Lỗi: ' + ERROR_MESSAGE();
+    END CATCH
+
+    PRINT @Result;  
+END;
+GO -- Lấy tất cả mã nhân viên từ bảng HoSoNhanVien
+EXEC dbo.ThemNhanVienVaChamCong;

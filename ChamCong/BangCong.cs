@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ClosedXML.Excel;
 namespace HMresourcemanagementsystem.ChamCong
 {
     public partial class BangCong : Form
@@ -57,30 +58,43 @@ namespace HMresourcemanagementsystem.ChamCong
             // Kiểm tra cột NGAY
             if (dataGridView1.Columns[e.ColumnIndex].Name == "NGAY")
             {
-                int ngay = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["NGAY"].Value);
-                int thang = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["THANG"].Value);
-                int nam = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["NAM"].Value);
-
-                // Kiểm tra xem năm, tháng, ngày có hợp lệ không
-                if (IsValidDate(nam, thang, ngay))
+                try
                 {
-                    DateTime currentDate = new DateTime(nam, thang, ngay);
+                    int ngay = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["NGAY"].Value);
+                    int thang = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["THANG"].Value);
+                    int nam = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["NAM"].Value);
 
-                    // Kiểm tra xem ngày có phải là ngày lễ không
-                    if (danhSachNgayLe.Exists(n => n.Ngay == currentDate.Day && n.Thang == currentDate.Month && n.Nam == currentDate.Year))
+                    // Kiểm tra xem năm, tháng, ngày có hợp lệ không
+                    if (IsValidDate(nam, thang, ngay))
                     {
-                        e.CellStyle.BackColor = System.Drawing.Color.Red; // Tô màu đỏ cho ô ngày
-                        e.CellStyle.ForeColor = System.Drawing.Color.White; // Tô màu chữ trắng
+                        DateTime currentDate = new DateTime(nam, thang, ngay);
 
-                        // Tô màu ô mô tả
-                        int motaColumnIndex = dataGridView1.Columns["MOTA"].Index; // Lấy chỉ số cột MOTA
-                        if (motaColumnIndex >= 0) // Kiểm tra cột tồn tại
+                        // Kiểm tra xem ngày có phải là ngày lễ không
+                        if (danhSachNgayLe.Exists(n => n.Ngay == currentDate.Day && n.Thang == currentDate.Month && n.Nam == currentDate.Year))
                         {
-                            dataGridView1.Rows[e.RowIndex].Cells[motaColumnIndex].Style.BackColor = System.Drawing.Color.Red; // Tô màu đỏ cho ô mô tả
-                            dataGridView1.Rows[e.RowIndex].Cells[motaColumnIndex].Style.ForeColor = System.Drawing.Color.White; // Tô màu chữ trắng cho mô tả
+                            e.CellStyle.BackColor = System.Drawing.Color.Red; // Tô màu đỏ cho ô ngày
+                            e.CellStyle.ForeColor = System.Drawing.Color.White; // Tô màu chữ trắng
+
+                            // Tô màu ô mô tả
+                            int motaColumnIndex = dataGridView1.Columns["MOTA"].Index; // Lấy chỉ số cột MOTA
+                            if (motaColumnIndex >= 0) // Kiểm tra cột tồn tại
+                            {
+                                dataGridView1.Rows[e.RowIndex].Cells[motaColumnIndex].Style.BackColor = System.Drawing.Color.Red; // Tô màu đỏ cho ô mô tả
+                                dataGridView1.Rows[e.RowIndex].Cells[motaColumnIndex].Style.ForeColor = System.Drawing.Color.White; // Tô màu chữ trắng cho mô tả
+                            }
                         }
                     }
+
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                finally
+                {
+                    connect.Close();
+                }
+
             }
         }
         private bool IsValidDate(int year, int month, int day)
@@ -180,7 +194,7 @@ namespace HMresourcemanagementsystem.ChamCong
                     {
                         checkCmd.Parameters.AddWithValue("@Ngay", holiday.Ngay);
                         checkCmd.Parameters.AddWithValue("@Thang", holiday.Thang);
-                        checkCmd.Parameters.AddWithValue("@Nam",holiday.Nam);
+                        checkCmd.Parameters.AddWithValue("@Nam", holiday.Nam);
                         int count = (int)checkCmd.ExecuteScalar();
                         if (count == 0) // Nếu chưa tồn tại
                         {
@@ -208,20 +222,56 @@ namespace HMresourcemanagementsystem.ChamCong
                 connect.Close();
             }
         }
-        private void load_datagridview()
+        private void load_datagridviewTongNgayCong()
+        {
+            connect.Open();
+            DateTime time = DateTime.Now;
+            int thang = time.Month;
+
+            try
+            {
+                string sql = @" SELECT DISTINCT BC.MANV AS N'Mã Nhân Viên', BC.TONGNGAYCONG AS N'Tổng Ngày Công' 
+                            FROM BANGCONG BC 
+                           WHERE BC.THANG=@THANG
+                            ";
+                using (cmd = new SqlCommand(sql, connect))
+                {
+                    cmd.Parameters.AddWithValue("@THANG", thang);
+                    da = new SqlDataAdapter(cmd);
+                    dt = new DataTable();
+                    da.Fill(dt);
+                    DTGVTongNgayCong.DataSource = dt;
+                }
+                connect.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                connect.Close();
+            }
+        }
+        private void load_datagridview(string maNhanVien)
         {
             connect.Open();
             try
             {
-                string sql = @"SELECT BC.MANV, NV.HoTen, BC.THU, BC.NGAY, BC.THANG, BC.NAM, BC.TRANGTHAI,BC.MOTA ,BC.TONGNGAYCONG
+                dataGridView1.DataSource = null;
+                string sql = @"SELECT BC.MANV, NV.HoTen, BC.THU, BC.NGAY, BC.THANG, BC.NAM, BC.TRANGTHAI,BC.MOTA 
                                FROM BANGCONG BC 
                                JOIN NHANVIEN NV ON NV.MANV = BC.MANV
+                               WHERE BC.MANV=@maNhanVien
                                ORDER BY BC.NGAY ASC, BC.THANG ASC, BC.NAM ASC";
-                cmd = new SqlCommand(sql, connect);
-                da = new SqlDataAdapter(cmd);
-                dt = new DataTable();
-                da.Fill(dt);
-                dataGridView1.DataSource = dt;
+                using (cmd = new SqlCommand(sql, connect))
+                {
+                    cmd.Parameters.AddWithValue("@maNhanVien", maNhanVien);
+                    da = new SqlDataAdapter(cmd);
+                    dt = new DataTable();
+                    da.Fill(dt);
+                    dataGridView1.DataSource = dt;
+                }
             }
             catch (Exception ex)
             {
@@ -235,7 +285,7 @@ namespace HMresourcemanagementsystem.ChamCong
 
         private void BangCong_Load(object sender, EventArgs e)
         {
-            load_datagridview();
+            load_datagridviewTongNgayCong();
             checkBox_ngay.Checked = true;
             checkBox_thang.Checked = true;
             checkBox_nam.Checked = true;
@@ -251,7 +301,7 @@ namespace HMresourcemanagementsystem.ChamCong
 
             if (checkBox_ngay.Checked && checkBox_thang.Checked && checkBox_nam.Checked)
             {
-                sql = @"SELECT BC.MANV, NV.HoTen, BC.THU, BC.NGAY, BC.THANG, BC.NAM, BC.TRANGTHAI
+                sql = @"SELECT BC.MANV, NV.HoTen, BC.THU, BC.NGAY, BC.THANG, BC.NAM, BC.TRANGTHAI,BC.MOTA 
                         FROM BANGCONG BC
                         JOIN NHANVIEN NV ON NV.MANV = BC.MANV
                         WHERE BC.NGAY = @NGAY AND BC.THANG = @THANG AND BC.NAM = @NAM
@@ -260,7 +310,7 @@ namespace HMresourcemanagementsystem.ChamCong
             }
             else if (checkBox_thang.Checked && checkBox_nam.Checked)
             {
-                sql = @"SELECT BC.MANV, NV.HoTen, BC.THU, BC.NGAY, BC.THANG, BC.NAM, BC.TRANGTHAI
+                sql = @"SELECT BC.MANV, NV.HoTen, BC.THU, BC.NGAY, BC.THANG, BC.NAM, BC.TRANGTHAI,BC.MOTA 
                         FROM BANGCONG BC
                         JOIN NHANVIEN NV ON NV.MANV = BC.MANV
                         WHERE BC.THANG = @THANG AND BC.NAM = @NAM
@@ -269,7 +319,7 @@ namespace HMresourcemanagementsystem.ChamCong
             }
             else if (checkBox_nam.Checked)
             {
-                sql = @"SELECT BC.MANV, NV.HoTen, BC.THU, BC.NGAY, BC.THANG, BC.NAM, BC.TRANGTHAI
+                sql = @"SELECT BC.MANV, NV.HoTen, BC.THU, BC.NGAY, BC.THANG, BC.NAM, BC.TRANGTHAI,BC.MOTA 
                         FROM BANGCONG BC
                         JOIN NHANVIEN NV ON NV.MANV = BC.MANV
                         WHERE BC.NAM = @NAM
@@ -326,8 +376,64 @@ namespace HMresourcemanagementsystem.ChamCong
             }
         }
 
+        private void DTGVTongNgayCong_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            // Kiểm tra nếu click vào cột "Mã Nhân Viên"
+            if (e.ColumnIndex == 0 && e.RowIndex >= 0) // Cột mã nhân viên
+            {
+                string maNhanVien = DTGVTongNgayCong.Rows[e.RowIndex].Cells[0].Value.ToString();
 
+                // Gọi phương thức để tải dữ liệu chấm công cho nhân viên này
+                load_datagridview(maNhanVien);
+            }
+        }
 
+        private void bt_xuatExcel_Click(object sender, EventArgs e)
+        {
+            DateTime time = DateTime.Now;
+            int thang = time.Month;
 
+            // Truy vấn SQL
+            string sql = @" SELECT BC.MANV, NV.HoTen, BC.THU, BC.NGAY, BC.THANG, BC.NAM, BC.TRANGTHAI, BC.MOTA 
+                    FROM BANGCONG BC 
+                    JOIN NHANVIEN NV ON NV.MANV = BC.MANV
+                    WHERE BC.THANG = @thang
+                    ORDER BY BC.NGAY ASC, BC.THANG ASC, BC.NAM ASC";
+
+            // Tạo đối tượng DataTable để lưu trữ dữ liệu từ database
+            DataTable dataTable = new DataTable();
+
+            // Kết nối đến database và lấy dữ liệu
+            connect.Open();
+            using (SqlCommand command = new SqlCommand(sql, connect))
+            {
+                // Thêm tham số
+                command.Parameters.AddWithValue("@thang", thang);
+                da = new SqlDataAdapter(command);
+                da.Fill(dataTable);  // Đổ dữ liệu vào DataTable
+            }
+            connect.Close(); // Đảm bảo đóng kết nối
+
+            // Kiểm tra xem DataTable có dữ liệu không
+            if (dataTable.Rows.Count == 0)
+            {
+                MessageBox.Show("Không có dữ liệu nào được tìm thấy.");
+                return;
+            }
+
+            // Tạo Workbook và Worksheet
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("BangCongThang");
+
+                // Đổ dữ liệu từ DataTable vào Worksheet
+                worksheet.Cell(1, 1).InsertTable(dataTable);
+
+                // Lưu file Excel
+                workbook.SaveAs(@"C:\Users\ASUS\OneDrive\Desktop\Desktop\DanhSachBangCong.xlsx"); // Thay thế đường dẫn phù hợp
+            }
+
+            MessageBox.Show("Xuất File Excel Thành Công ");
+        }
     }
 }

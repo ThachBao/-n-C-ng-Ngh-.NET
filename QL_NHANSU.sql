@@ -1,4 +1,4 @@
-﻿-- Tạo cơ sở dữ liệu QL_NHANSU
+﻿﻿-- Tạo cơ sở dữ liệu QL_NHANSU
 CREATE DATABASE QL_NHANSU;
 GO
 
@@ -158,7 +158,6 @@ ADD THU AS
 GO
 
 
-
 CREATE TRIGGER THEMDULIEUVAOBANGCONG
 ON CHAMCONG
 FOR INSERT
@@ -170,9 +169,9 @@ BEGIN
         SELECT 
             NEWID(),  -- Sinh ID_BANGCONG mới
             i.MANV,  -- Lấy MANV từ bảng ảo INSERTED
-            DAY(GETDATE()) AS NGAY,  -- Lấy ngày từ THOIGIANVAO trong bảng ảo
-            MONTH(GETDATE()) AS THANG,  -- Lấy tháng từ THOIGIANVAO trong bảng ảo
-            YEAR(GETDATE()) AS NAM,  -- Lấy năm từ THOIGIANVAO trong bảng ảo
+            DAY(i.NGAYVAO) AS NGAY,  
+            MONTH(i.NGAYVAO) AS THANG,  
+            YEAR(i.NGAYVAO) AS NAM, 
             i.ID_CHAMCONG  -- Lấy ID_CHAMCONG từ bảng ảo INSERTED
         FROM 
             INSERTED i;  -- Lấy dữ liệu từ bảng ảo INSERTED (các bản ghi mới được thêm)
@@ -183,7 +182,6 @@ BEGIN
     END CATCH
 END;
 GO
-
 CREATE TRIGGER trg_UpdateTrangThai
 ON CHAMCONG
 AFTER INSERT, UPDATE
@@ -230,6 +228,35 @@ BEGIN
     INNER JOIN inserted I ON BG.MaNV = I.MaNV AND BG.THANG = I.THANG AND BG.NAM = I.NAM;
 END;
 GO
+CREATE TRIGGER trg_updateMoTa
+ON BANGCONG
+AFTER INSERT
+AS
+BEGIN
+   
+    DECLARE @NgayLe TABLE (
+        NGAY INT,
+        THANG INT,
+        NAM INT,
+        TENLE NVARCHAR(100)
+    );
+
+    INSERT INTO @NgayLe
+    SELECT NGAY, THANG, NAM, TENLE
+    FROM NgayLe;
+
+    UPDATE BANGCONG
+    SET MOTA = COALESCE(
+                   (SELECT TOP 1 NL.TENLE
+                    FROM @NgayLe NL
+                    WHERE BANGCONG.NGAY = NL.NGAY 
+                      AND BANGCONG.THANG = NL.THANG 
+                      AND BANGCONG.NAM = NL.NAM),
+                   CASE WHEN BANGCONG.THU = N'Chủ nhật' THEN N'Chủ nhật' ELSE N'Bình thường' END)
+    FROM BANGCONG
+    INNER JOIN inserted i ON BANGCONG.ID_BANGCONG = i.ID_BANGCONG;
+END;
+
 CREATE TABLE NgayLe (
     ID INT PRIMARY KEY IDENTITY(1,1),
     NGAY INT NOT NULL,
@@ -262,41 +289,6 @@ BEGIN
         -- Nếu đã tồn tại, không thêm và có thể thông báo
         RAISERROR('Ngày lễ đã tồn tại trong bảng NgayLe.', 16, 1);
     END
-END;
-GO
-CREATE TRIGGER trg_UpdateMota
-ON BANGCONG
-AFTER INSERT, UPDATE
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    -- Chỉ thực hiện cập nhật nếu bảng INSERTED có dữ liệu
-    IF EXISTS (SELECT 1 FROM inserted)
-    BEGIN
-        -- Cập nhật trường MOTA trong bảng BANGCONG
-        UPDATE BG
-        SET MOTA = NL.TenLe
-        FROM BANGCONG BG
-        INNER JOIN inserted I ON BG.ID_BANGCONG = I.ID_BANGCONG
-        INNER JOIN NgayLe NL ON I.NGAY = NL.NGAY AND I.THANG = NL.THANG AND I.NAM = NL.NAM
-        WHERE BG.MOTA <> NL.TenLe;  -- Chỉ cập nhật khi cần thiết
-    END
-END;
-GO
-CREATE TRIGGER trg_UpdateMota2
-ON BANGCONG
-AFTER INSERT, UPDATE
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    -- Cập nhật trường MOTA nếu ngày là Chủ nhật
-    UPDATE BG
-    SET MOTA = N'Chủ nhật'
-    FROM BANGCONG BG
-    INNER JOIN inserted I ON BG.ID_BANGCONG = I.ID_BANGCONG
-    WHERE I.NGAY = 1 AND I.THANG = 1;  -- Thay đổi điều kiện này để kiểm tra ngày Chủ nhật
 END;
 GO
 
@@ -947,7 +939,7 @@ INSERT INTO DAUVIECDUAN (MaDauViec, TenDauViec, MaDuAn, MaNV) VALUES
 ('DV049', N'Kiểm thử', 'DA10', 'NV049'),
 ('DV050', N'Bàn giao tài liệu', 'DA10', 'NV050');
 
-SELECT * FROM HoSoNhanVien
+SELECT * FROM NhanVien
 SELECT * FROM Luong
 SELECT * FROM HopDong
 SELECT * FROM BaoHiem
@@ -965,10 +957,11 @@ SELECT * FROM NgayLe
 drop table BaoHiem
 drop table BoPhan
 drop table CHAMCONG
+drop table BANGCONG
 drop table ChucVu
 drop table DuAn
 drop table HopDong
-drop table HoSoNhanVien
+drop table NhanVien
 drop table KhenThuongKyLuat
 drop table Luong
 drop table PhanCong
@@ -976,46 +969,31 @@ drop table PhongBan
 drop table TrinhDoNangLuc
 drop table NgayLe
 
---mỗi ngày import vào mỗi nhân viên
-CREATE PROCEDURE dbo.ThemNhanVienVaChamCong
-AS
+DECLARE @CurrentDate DATETIME = GETDATE();
+
+INSERT INTO CHAMCONG (ID_CHAMCONG, NGAYVAO, MANV)
+SELECT 
+    LEFT(CAST(MANV AS CHAR(10)) + FORMAT(@CurrentDate, 'MMdd'), 20), -- Chỉ lấy phần cần thiết
+    @CurrentDate, 
+    MANV
+FROM NhanVien;
+--import 1 nhân viên trong 30 ngày
+
+DECLARE @CurrentDate DATETIME = '2024-12-01';  -- Ngày bắt đầu tháng
+DECLARE @EndDate DATETIME = '2024-12-31';      -- Ngày kết thúc tháng
+DECLARE @EmployeeID NVARCHAR(10) = 'NV001';    -- Mã nhân viên
+
+-- Vòng lặp để thêm bản ghi cho mỗi ngày trong tháng
+WHILE @CurrentDate <= @EndDate
 BEGIN
-    DECLARE @CurrentDate DATETIME = GETDATE();
-    DECLARE @Result NVARCHAR(100);
-    DECLARE @ID_CHAMCONG NVARCHAR(20);
+    -- Kiểm tra nếu không phải chủ nhật (ngày chủ nhật có mã là 1)
+    IF DATEPART(WEEKDAY, @CurrentDate) <> 1
+    BEGIN
+        -- Thêm bản ghi vào bảng CHAMCONG cho mỗi ngày, chỉ nếu không phải chủ nhật
+        INSERT INTO CHAMCONG (ID_CHAMCONG, NGAYVAO, MANV, TRANGTHAIVAO, TRANGTHAIRA)
+        VALUES (LEFT(@EmployeeID + FORMAT(@CurrentDate, 'yyyyMMdd'), 20), @CurrentDate, @EmployeeID, 1, 1);
+    END
 
-    BEGIN TRY
-        -- Thêm dữ liệu vào bảng CHAMCONG
-        DECLARE cur CURSOR FOR 
-        SELECT MANV FROM NhanVien;
-
-        OPEN cur;
-        FETCH NEXT FROM cur INTO @ID_CHAMCONG;
-
-        WHILE @@FETCH_STATUS = 0
-        BEGIN
-            DECLARE @NewID NVARCHAR(50) = LEFT(CAST(@ID_CHAMCONG AS CHAR(10)) + FORMAT(@CurrentDate, 'MMdd'), 20);
-
-            -- Kiểm tra sự tồn tại của ID_CHAMCONG
-            IF NOT EXISTS (SELECT 1 FROM CHAMCONG WHERE ID_CHAMCONG = @NewID)
-            BEGIN
-                INSERT INTO CHAMCONG (ID_CHAMCONG, NGAYVAO, MANV)
-                VALUES (@NewID, @CurrentDate, @ID_CHAMCONG);
-            END
-
-            FETCH NEXT FROM cur INTO @ID_CHAMCONG;
-        END
-
-        CLOSE cur;
-        DEALLOCATE cur;
-
-        SET @Result = N'Thêm nhân viên vào bảng CHAMCONG thành công.';
-    END TRY
-    BEGIN CATCH
-        SET @Result = N'Lỗi: ' + ERROR_MESSAGE();
-    END CATCH
-
-    PRINT @Result;  
-END;
-GO -- Lấy tất cả mã nhân viên từ bảng HoSoNhanVien
-EXEC dbo.ThemNhanVienVaChamCong;
+    -- Tiến tới ngày tiếp theo
+    SET @CurrentDate = DATEADD(DAY, 1, @CurrentDate);
+END

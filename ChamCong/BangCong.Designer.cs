@@ -50,20 +50,23 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.btn_exit = new System.Windows.Forms.Button();
+            this.DTGVTongNgayCong = new System.Windows.Forms.DataGridView();
+            this.bt_xuatExcel = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.DTGVTongNgayCong)).BeginInit();
             this.SuspendLayout();
             // 
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(109, 302);
+            this.dataGridView1.Location = new System.Drawing.Point(413, 297);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(1171, 455);
+            this.dataGridView1.Size = new System.Drawing.Size(1052, 390);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dataGridView1_CellFormatting);
             this.dataGridView1.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValueChanged);
@@ -112,7 +115,7 @@
             this.tùyChọnToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1397, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(1477, 30);
             this.menuStrip1.TabIndex = 6;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -251,18 +254,41 @@
             // 
             // btn_exit
             // 
-            this.btn_exit.Location = new System.Drawing.Point(947, 794);
+            this.btn_exit.Location = new System.Drawing.Point(952, 720);
             this.btn_exit.Name = "btn_exit";
             this.btn_exit.Size = new System.Drawing.Size(251, 72);
             this.btn_exit.TabIndex = 10;
             this.btn_exit.Text = "Thoát";
             this.btn_exit.UseVisualStyleBackColor = true;
             // 
+            // DTGVTongNgayCong
+            // 
+            this.DTGVTongNgayCong.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.DTGVTongNgayCong.Location = new System.Drawing.Point(45, 297);
+            this.DTGVTongNgayCong.Name = "DTGVTongNgayCong";
+            this.DTGVTongNgayCong.RowHeadersWidth = 51;
+            this.DTGVTongNgayCong.RowTemplate.Height = 24;
+            this.DTGVTongNgayCong.Size = new System.Drawing.Size(313, 390);
+            this.DTGVTongNgayCong.TabIndex = 11;
+            this.DTGVTongNgayCong.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.DTGVTongNgayCong_CellClick);
+            // 
+            // bt_xuatExcel
+            // 
+            this.bt_xuatExcel.Location = new System.Drawing.Point(114, 720);
+            this.bt_xuatExcel.Name = "bt_xuatExcel";
+            this.bt_xuatExcel.Size = new System.Drawing.Size(235, 72);
+            this.bt_xuatExcel.TabIndex = 12;
+            this.bt_xuatExcel.Text = "Xuất Excel";
+            this.bt_xuatExcel.UseVisualStyleBackColor = true;
+            this.bt_xuatExcel.Click += new System.EventHandler(this.bt_xuatExcel_Click);
+            // 
             // BangCong
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1397, 934);
+            this.ClientSize = new System.Drawing.Size(1477, 1012);
+            this.Controls.Add(this.bt_xuatExcel);
+            this.Controls.Add(this.DTGVTongNgayCong);
             this.Controls.Add(this.btn_exit);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -280,6 +306,7 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.DTGVTongNgayCong)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -308,5 +335,7 @@
         private System.Windows.Forms.CheckBox checkBox_thang;
         private System.Windows.Forms.CheckBox checkBox_ngay;
         private System.Windows.Forms.Button btn_exit;
+        private System.Windows.Forms.DataGridView DTGVTongNgayCong;
+        private System.Windows.Forms.Button bt_xuatExcel;
     }
 }

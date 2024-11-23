@@ -26,6 +26,7 @@ namespace HMresourcemanagementsystem.ChamCong
         }
         void load_dataGridView()
         {
+            dataGridView1.DataSource = null;
             try
             {
                 string sql = @"SELECT CC.ID_CHAMCONG, CC.MANV AS N'Mã Nhân Viên', NV.HOTEN N'Tên Nhân Viên',CC.NGAYVAO AS N'Ngày Hiện Tại', CC.TRANGTHAIVAO AS N'CHECK IN VÀO', CC.TRANGTHAIRA AS N'CHECK IN RA'
@@ -122,7 +123,7 @@ namespace HMresourcemanagementsystem.ChamCong
 
 
 
-        
+
         void UpdateDatabase(string maNV, bool trangThaiVao, bool trangThaiRa, DateTime thoiGianVao)
         {
             string sql = @"UPDATE CHAMCONG
@@ -179,9 +180,152 @@ namespace HMresourcemanagementsystem.ChamCong
                     MessageBox.Show(ex.Message);
 
                 }
-                
-                
+
+
             }
+        }
+
+        private void Rb_vao_CheckedChanged(object sender, EventArgs e)
+        {
+            if (Rb_vao.Checked == true)
+            {
+                Rb_ra.Checked = false;
+            }
+
+        }
+
+        private void Rb_ra_CheckedChanged(object sender, EventArgs e)
+        {
+            if (Rb_ra.Checked == true)
+            {
+                Rb_vao.Checked = false;
+            }
+        }
+        private bool kiemTraTrangThaiRa(string manv)
+        {
+            bool hasCheckedOut = false; // Biến để kiểm tra trạng thái CHECK OUT
+            foreach (DataGridViewRow row in dataGridView1.Rows)
+            {
+                // Kiểm tra mã nhân viên
+                if (row.Cells["Mã Nhân Viên"].Value != null &&
+                    row.Cells["Mã Nhân Viên"].Value.ToString().ToUpper() == manv.ToUpper()) // So sánh không phân biệt chữ hoa
+                {
+
+                    hasCheckedOut = row.Cells["CHECK IN RA"].Value != DBNull.Value &&
+                                    Convert.ToBoolean(row.Cells["CHECK IN RA"].Value);
+
+                    // Thoát vòng lặp sau khi tìm thấy nhân viên
+                    break;
+                }
+            }
+            return hasCheckedOut;
+        }
+        private bool kiemTraTrangThaiVao(string manv)
+        {
+            
+                bool hasCheckedIn = false; // Biến để kiểm tra trạng thái CHECK IN
+               
+
+                // Lặp qua tất cả các dòng trong DataGridView
+                foreach (DataGridViewRow row in dataGridView1.Rows)
+                {
+                    // Kiểm tra mã nhân viên
+                    if (row.Cells["Mã Nhân Viên"].Value != null &&
+                        row.Cells["Mã Nhân Viên"].Value.ToString().ToUpper() == manv.ToUpper()) // So sánh không phân biệt chữ hoa
+                    {
+                        hasCheckedIn = row.Cells["CHECK IN VÀO"].Value != DBNull.Value &&
+                                       Convert.ToBoolean(row.Cells["CHECK IN VÀO"].Value);
+
+                        
+                        // Thoát vòng lặp sau khi tìm thấy nhân viên
+                        break;
+                    }
+                }
+            return hasCheckedIn;
+            
+        }
+        private void bt_xacNhan_Click(object sender, EventArgs e)
+        {
+            //false là tích true là không tích 
+            // Lấy mã nhân viên từ TextBox
+            string maNV = txt_maNhanVien.Text.ToUpper();
+
+            // Kiểm tra trạng thái của RadioButton
+            if (Rb_vao.Checked)
+            {
+                if (kiemTraTrangThaiVao(maNV) != true)
+                {
+                    // Nếu Rb_vao được chọn, tìm dòng có mã nhân viên khớp
+                    foreach (DataGridViewRow row in dataGridView1.Rows)
+                    {
+                        if (row.Cells["Mã Nhân Viên"].Value != null &&
+                            row.Cells["Mã Nhân Viên"].Value.ToString() == maNV)
+                        {
+                            bool trangThaiVao = row.Cells["CHECK IN VÀO"].Value != DBNull.Value
+                                                ? Convert.ToBoolean(row.Cells["CHECK IN VÀO"].Value)
+                                                : false;//FALSE
+
+                            // Cập nhật cơ sở dữ liệu
+                            DateTime thoiGianVao = Convert.ToDateTime(row.Cells["Ngày Hiện Tại"].Value);
+                            UpdateDatabase(maNV, trangThaiVao, !trangThaiVao, thoiGianVao);//mình đẻ phủ địch trong hàm update này nên buộc bool là phải false
+                            break; // Thoát khỏi vòng lặp sau khi đã cập nhật
+                        }
+                    }
+                }
+                else
+                    MessageBox.Show("Nhân Viên Đã Chấm Công Vào Rồi", "Thông Báo", MessageBoxButtons.OK);
+            }
+            else if (Rb_ra.Checked)
+            {
+                if (kiemTraTrangThaiRa(maNV) != true)
+                {
+                    // Nếu Rb_ra được chọn, tìm dòng có mã nhân viên khớp
+                    foreach (DataGridViewRow row in dataGridView1.Rows)
+                    {
+                        if (row.Cells["Mã Nhân Viên"].Value != null &&
+                            row.Cells["Mã Nhân Viên"].Value.ToString() == maNV)
+                        {
+                            bool trangThaiVao = row.Cells["CHECK IN VÀO"].Value != DBNull.Value
+                                                ? !Convert.ToBoolean(row.Cells["CHECK IN VÀO"].Value)
+                                                : true;
+
+                            // Chỉ cho phép CHECK IN RA nếu đã CHECK IN VÀO
+                            if (trangThaiVao != true)
+                            {
+                                bool trangThaiRa = row.Cells["CHECK IN RA"].Value != DBNull.Value
+                                                   ? Convert.ToBoolean(row.Cells["CHECK IN RA"].Value)
+                                                   : false;
+
+
+
+                                // Cập nhật cơ sở dữ liệu
+                                DateTime thoiGianVao = Convert.ToDateTime(row.Cells["Ngày Hiện Tại"].Value);
+                                UpdateDatabase(maNV, trangThaiVao, trangThaiRa, thoiGianVao);
+                            }
+                            else
+                            {
+                                MessageBox.Show("Không thể CHECK IN RA vì nhân viên chưa CHECK IN VÀO.");
+                            }
+                            break; // Thoát khỏi vòng lặp sau khi đã cập nhật
+                        }
+                    }
+                }
+                else
+                    MessageBox.Show("Nhân Viên Đã Chấm Công Ra Rồi", "Thông Báo", MessageBoxButtons.OK);
+            }
+            else
+            {
+                MessageBox.Show("Vui lòng chọn một trạng thái vào hoặc ra.");
+            }
+
+            // Xóa mã nhân viên và tải lại dữ liệu
+            txt_maNhanVien.Clear();
+            load_dataGridView();
+        }
+
+        private void bt_lamMoi_Click(object sender, EventArgs e)
+        {
+            load_dataGridView();
         }
     }
 }

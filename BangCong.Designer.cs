@@ -40,39 +40,44 @@
             this.menuChínhToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.checkBox_nam = new System.Windows.Forms.CheckBox();
+            this.checkBox_thang = new System.Windows.Forms.CheckBox();
+            this.checkBox_ngay = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.txt_tenNhanVien = new System.Windows.Forms.TextBox();
             this.txt_maNV = new System.Windows.Forms.TextBox();
             this.bt_timKiemTheoTen = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.checkBox_ngay = new System.Windows.Forms.CheckBox();
-            this.checkBox_thang = new System.Windows.Forms.CheckBox();
-            this.checkBox_nam = new System.Windows.Forms.CheckBox();
+            this.btn_exit = new System.Windows.Forms.Button();
+            this.DTGVTongNgayCong = new System.Windows.Forms.DataGridView();
+            this.bt_xuatExcel = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.DTGVTongNgayCong)).BeginInit();
             this.SuspendLayout();
             // 
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(12, 311);
+            this.dataGridView1.Location = new System.Drawing.Point(413, 297);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(1171, 455);
+            this.dataGridView1.Size = new System.Drawing.Size(1052, 390);
             this.dataGridView1.TabIndex = 0;
+            this.dataGridView1.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dataGridView1_CellFormatting);
             this.dataGridView1.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValueChanged);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(507, 53);
+            this.label1.Font = new System.Drawing.Font("Times New Roman", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(604, 44);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(156, 32);
+            this.label1.Size = new System.Drawing.Size(149, 34);
             this.label1.TabIndex = 1;
             this.label1.Text = "Bảng Công";
             // 
@@ -88,7 +93,7 @@
             // 
             // DTP
             // 
-            this.DTP.Location = new System.Drawing.Point(148, 36);
+            this.DTP.Location = new System.Drawing.Point(161, 40);
             this.DTP.Name = "DTP";
             this.DTP.Size = new System.Drawing.Size(195, 22);
             this.DTP.TabIndex = 4;
@@ -110,7 +115,7 @@
             this.tùyChọnToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1351, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(1477, 30);
             this.menuStrip1.TabIndex = 6;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -119,22 +124,23 @@
             this.tùyChọnToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.quayLạiToolStripMenuItem,
             this.menuChínhToolStripMenuItem});
+            this.tùyChọnToolStripMenuItem.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tùyChọnToolStripMenuItem.Name = "tùyChọnToolStripMenuItem";
-            this.tùyChọnToolStripMenuItem.Size = new System.Drawing.Size(84, 24);
+            this.tùyChọnToolStripMenuItem.Size = new System.Drawing.Size(101, 26);
             this.tùyChọnToolStripMenuItem.Text = "Tùy Chọn";
             // 
             // quayLạiToolStripMenuItem
             // 
             this.quayLạiToolStripMenuItem.Name = "quayLạiToolStripMenuItem";
-            this.quayLạiToolStripMenuItem.Size = new System.Drawing.Size(170, 26);
-            this.quayLạiToolStripMenuItem.Text = "Quay Lại";
+            this.quayLạiToolStripMenuItem.Size = new System.Drawing.Size(351, 26);
+            this.quayLạiToolStripMenuItem.Text = "Quay Lại Danh Sách Chấm Công";
             this.quayLạiToolStripMenuItem.Click += new System.EventHandler(this.quayLạiToolStripMenuItem_Click);
             // 
             // menuChínhToolStripMenuItem
             // 
             this.menuChínhToolStripMenuItem.Name = "menuChínhToolStripMenuItem";
-            this.menuChínhToolStripMenuItem.Size = new System.Drawing.Size(170, 26);
-            this.menuChínhToolStripMenuItem.Text = "Menu Chính";
+            this.menuChínhToolStripMenuItem.Size = new System.Drawing.Size(351, 26);
+            this.menuChínhToolStripMenuItem.Text = "Quay Lại Trang Chủ";
             // 
             // contextMenuStrip1
             // 
@@ -150,12 +156,45 @@
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.DTP);
             this.groupBox1.Controls.Add(this.bt_timKiemTheoNgay);
-            this.groupBox1.Location = new System.Drawing.Point(34, 122);
+            this.groupBox1.Location = new System.Drawing.Point(45, 113);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(572, 141);
             this.groupBox1.TabIndex = 8;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Tìm Kiếm Theo Ngày";
+            // 
+            // checkBox_nam
+            // 
+            this.checkBox_nam.AutoSize = true;
+            this.checkBox_nam.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBox_nam.Location = new System.Drawing.Point(338, 98);
+            this.checkBox_nam.Name = "checkBox_nam";
+            this.checkBox_nam.Size = new System.Drawing.Size(66, 24);
+            this.checkBox_nam.TabIndex = 8;
+            this.checkBox_nam.Text = "Năm";
+            this.checkBox_nam.UseVisualStyleBackColor = true;
+            // 
+            // checkBox_thang
+            // 
+            this.checkBox_thang.AutoSize = true;
+            this.checkBox_thang.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBox_thang.Location = new System.Drawing.Point(203, 98);
+            this.checkBox_thang.Name = "checkBox_thang";
+            this.checkBox_thang.Size = new System.Drawing.Size(77, 24);
+            this.checkBox_thang.TabIndex = 7;
+            this.checkBox_thang.Text = "Tháng";
+            this.checkBox_thang.UseVisualStyleBackColor = true;
+            // 
+            // checkBox_ngay
+            // 
+            this.checkBox_ngay.AutoSize = true;
+            this.checkBox_ngay.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBox_ngay.Location = new System.Drawing.Point(60, 98);
+            this.checkBox_ngay.Name = "checkBox_ngay";
+            this.checkBox_ngay.Size = new System.Drawing.Size(69, 24);
+            this.checkBox_ngay.TabIndex = 6;
+            this.checkBox_ngay.Text = "Ngày";
+            this.checkBox_ngay.UseVisualStyleBackColor = true;
             // 
             // groupBox2
             // 
@@ -164,7 +203,7 @@
             this.groupBox2.Controls.Add(this.bt_timKiemTheoTen);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Location = new System.Drawing.Point(649, 122);
+            this.groupBox2.Location = new System.Drawing.Point(636, 113);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(556, 141);
             this.groupBox2.TabIndex = 9;
@@ -213,44 +252,44 @@
             this.label3.TabIndex = 0;
             this.label3.Text = "Nhập Mã Nhân Viên";
             // 
-            // checkBox_ngay
+            // btn_exit
             // 
-            this.checkBox_ngay.AutoSize = true;
-            this.checkBox_ngay.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBox_ngay.Location = new System.Drawing.Point(60, 98);
-            this.checkBox_ngay.Name = "checkBox_ngay";
-            this.checkBox_ngay.Size = new System.Drawing.Size(69, 24);
-            this.checkBox_ngay.TabIndex = 6;
-            this.checkBox_ngay.Text = "Ngày";
-            this.checkBox_ngay.UseVisualStyleBackColor = true;
+            this.btn_exit.Location = new System.Drawing.Point(952, 720);
+            this.btn_exit.Name = "btn_exit";
+            this.btn_exit.Size = new System.Drawing.Size(251, 72);
+            this.btn_exit.TabIndex = 10;
+            this.btn_exit.Text = "Thoát";
+            this.btn_exit.UseVisualStyleBackColor = true;
             // 
-            // checkBox_thang
+            // DTGVTongNgayCong
             // 
-            this.checkBox_thang.AutoSize = true;
-            this.checkBox_thang.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBox_thang.Location = new System.Drawing.Point(203, 98);
-            this.checkBox_thang.Name = "checkBox_thang";
-            this.checkBox_thang.Size = new System.Drawing.Size(77, 24);
-            this.checkBox_thang.TabIndex = 7;
-            this.checkBox_thang.Text = "Tháng";
-            this.checkBox_thang.UseVisualStyleBackColor = true;
+            this.DTGVTongNgayCong.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.DTGVTongNgayCong.Location = new System.Drawing.Point(45, 297);
+            this.DTGVTongNgayCong.Name = "DTGVTongNgayCong";
+            this.DTGVTongNgayCong.RowHeadersWidth = 51;
+            this.DTGVTongNgayCong.RowTemplate.Height = 24;
+            this.DTGVTongNgayCong.Size = new System.Drawing.Size(313, 390);
+            this.DTGVTongNgayCong.TabIndex = 11;
+            this.DTGVTongNgayCong.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.DTGVTongNgayCong_CellClick);
             // 
-            // checkBox_nam
+            // bt_xuatExcel
             // 
-            this.checkBox_nam.AutoSize = true;
-            this.checkBox_nam.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBox_nam.Location = new System.Drawing.Point(338, 98);
-            this.checkBox_nam.Name = "checkBox_nam";
-            this.checkBox_nam.Size = new System.Drawing.Size(66, 24);
-            this.checkBox_nam.TabIndex = 8;
-            this.checkBox_nam.Text = "Năm";
-            this.checkBox_nam.UseVisualStyleBackColor = true;
+            this.bt_xuatExcel.Location = new System.Drawing.Point(114, 720);
+            this.bt_xuatExcel.Name = "bt_xuatExcel";
+            this.bt_xuatExcel.Size = new System.Drawing.Size(235, 72);
+            this.bt_xuatExcel.TabIndex = 12;
+            this.bt_xuatExcel.Text = "Xuất Excel";
+            this.bt_xuatExcel.UseVisualStyleBackColor = true;
+            this.bt_xuatExcel.Click += new System.EventHandler(this.bt_xuatExcel_Click);
             // 
             // BangCong
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1351, 830);
+            this.ClientSize = new System.Drawing.Size(1477, 1012);
+            this.Controls.Add(this.bt_xuatExcel);
+            this.Controls.Add(this.DTGVTongNgayCong);
+            this.Controls.Add(this.btn_exit);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label1);
@@ -267,6 +306,7 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.DTGVTongNgayCong)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -294,5 +334,8 @@
         private System.Windows.Forms.CheckBox checkBox_nam;
         private System.Windows.Forms.CheckBox checkBox_thang;
         private System.Windows.Forms.CheckBox checkBox_ngay;
+        private System.Windows.Forms.Button btn_exit;
+        private System.Windows.Forms.DataGridView DTGVTongNgayCong;
+        private System.Windows.Forms.Button bt_xuatExcel;
     }
 }
